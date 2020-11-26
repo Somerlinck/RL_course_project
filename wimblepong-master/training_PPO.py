@@ -71,6 +71,13 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
         else:
             avg = np.mean(reward_history)
         average_reward_history.append(avg)
+        
+        if episode_number % 1000 == 0 :
+          model_name = "modelPG_" + str(episode_number)
+          path = f'/content/drive/My Drive/wimblepong/{model_name}.mdl'
+          print(f'Saving {model_name} model...')
+          torch.save(agent.policy.state_dict(), path)
+          print(f'{model_name} saved successfully.')
 
         # Let the agent do its magic (update the policy)
         agent.update(episode_number)
