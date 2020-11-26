@@ -74,7 +74,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
         
         if episode_number % 1000 == 0 :
           model_name = "modelPG_" + str(episode_number)
-          path = f'/Model/{model_name}.mdl'
+          path = f'Model/{model_name}.mdl'
           print(f'Saving {model_name} model...')
           torch.save(agent.policy.state_dict(), path)
           print(f'{model_name} saved successfully.')
