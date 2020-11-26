@@ -72,7 +72,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
             avg = np.mean(reward_history)
         average_reward_history.append(avg)
         
-        if episode_number % 1000 == 0 :
+        if episode_number % 10000 == 0 :
           model_name = "modelPG_" + str(episode_number)
           path = f'Model/{model_name}.mdl'
           print(f'Saving {model_name} model...')
