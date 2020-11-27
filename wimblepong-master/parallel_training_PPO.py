@@ -30,7 +30,11 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=200000, u
     # Instantiate agent and its policy
     AC_old = ActorCritic(observation_space_dim, action_space_dim)
     AC = ActorCritic(observation_space_dim, action_space_dim)
+
+    AC.load_state_dict(torch.load('Model/modelPG_last.mdl'))
+
     agent = Agent(AC_old, AC)
+
 
     # Arrays to keep track of rewards
     reward_history, timestep_history = [], []
