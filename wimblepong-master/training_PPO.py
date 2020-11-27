@@ -4,7 +4,6 @@ import numpy as np
 import argparse
 from wimblepong.PPO_agent import Agent, ActorCritic
 import pandas as pd
-import matplotlib.pyplot as plt
 
 
 def transform_observation(previous_observation, observation, x_arena_res=200, y_arena_res=200):
@@ -28,12 +27,9 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
     AC = ActorCritic(observation_space_dim, action_space_dim)
     agent = Agent(AC_old, AC)
 
-    # Arrays to keep track of rewards
-    reward_history, timestep_history = [], []
-    average_reward_history = []
-
     # Run actual training
-    for episode_number in range(train_episodes):
+    episode_number = 0
+    while True: # loop forever
         reward_sum, timesteps = 0, 0
         done = False
         # Reset the environment and observe the initial state
@@ -63,16 +59,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
             print("Episode {} finished. Total reward: {:.3g} ({} timesteps)"
                   .format(episode_number, reward_sum, timesteps))
 
-        # Bookkeeping (mainly for generating plots)
-        reward_history.append(reward_sum)
-        timestep_history.append(timesteps)
-        if episode_number > 100:
-            avg = np.mean(reward_history[-100:])
-        else:
-            avg = np.mean(reward_history)
-        average_reward_history.append(avg)
-        
-        if episode_number % 10000 == 0 :
+        if episode_number % 10000 == 0:
           model_name = "modelPG_" + str(episode_number)
           path = f'Model/{model_name}.mdl'
           print(f'Saving {model_name} model...')
@@ -81,22 +68,7 @@ def train(env_name, print_things=True, train_run_id=0, train_episodes=5000):
 
         # Let the agent do its magic (update the policy)
         agent.update(episode_number)
-
-    # Training is finished - plot rewards
-    if print_things:
-        plt.plot(reward_history)
-        plt.plot(average_reward_history)
-        plt.legend(["Reward", "100-episode average"])
-        plt.title("Reward history")
-        plt.show()
-        print("Training finished.")
-    data = pd.DataFrame({"episode": np.arange(len(reward_history)),
-                         "train_run_id": [train_run_id]*len(reward_history),
-                         # TODO: Change algorithm name for plots, if you want
-                         "algorithm": ["PG"]*len(reward_history),
-                         "reward": reward_history})
-    torch.save(agent.policy.state_dict(), "model_%s_%d.mdl" % (env_name, train_run_id))
-    return data
+        episode_number += 1
 
 
 # Function to test a trained policy
