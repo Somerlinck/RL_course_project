@@ -17,7 +17,7 @@ def transform_observations(previous_observations, observations, x_arena_res=200,
 
 
 # Policy training function
-def train(env_name, print_things=True, train_run_id=0, train_timesteps=200000, update_steps=50):
+def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=False):
     # Create a Gym environment
     # This creates 64 parallel envs running in 8 processes (8 envs each)
     env = ParallelEnvs(env_name, processes=8, envs_per_process=8)
@@ -31,7 +31,8 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=200000, u
     AC_old = ActorCritic(observation_space_dim, action_space_dim)
     AC = ActorCritic(observation_space_dim, action_space_dim)
 
-    AC.load_state_dict(torch.load('Model/modelPG_last.mdl'))
+    if load :
+        AC.load_state_dict(torch.load('Model/modelPG_last.mdl'))
 
     agent = Agent(AC_old, AC)
 
@@ -121,6 +122,7 @@ if __name__ == "__main__":
     parser.add_argument("--env", type=str, default="WimblepongVisualSimpleAI-v0", help="Environment to use")
     parser.add_argument("--train_timesteps", type=int, default=1000, help="Number of timesteps to train for")
     parser.add_argument("--render_test", action='store_true', help="Render test")
+    parser.add_argument("--load", action='store_true', help="load a saved model")
     args = parser.parse_args()
 
     # If no model was passed, train a policy from scratch.
