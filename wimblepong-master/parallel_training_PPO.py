@@ -32,6 +32,7 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, u
     AC = ActorCritic(observation_space_dim, action_space_dim)
 
     if load :
+        print("Loading model")
         AC.load_state_dict(torch.load('Model/modelPG_last.mdl'))
 
     agent = Agent(AC_old, AC)
@@ -107,7 +108,7 @@ def test(env_name, episodes, params, render):
             # get the action, act on the environment, save total reward
             # (evaluation=True makes the agent always return what it thinks to be
             # the best action - there is no exploration at this point)
-            state = transform_observations(previous_observation, observation)
+            state = transform_observations(previous_observation.reshape((1,200,200)), observation)
             action, _ = agent.get_action(state, evaluation=True)
             previous_observation = observation
             observation, reward, done, info = env.step(action.detach().cpu().numpy())
