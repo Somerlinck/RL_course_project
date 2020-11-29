@@ -85,8 +85,8 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, u
           path = f'Model/{model_name}.mdl'
           print(f'Saving {model_name} model...')
           checkpoint = {
-              'model'=agent.policy.state_dict(),
-              'optimizer' = agent.optimizer.state_dict()
+              'model':agent.policy.state_dict(),
+              'optimizer': agent.optimizer.state_dict()
           }
           torch.save(checkpoint, path)
           print(f'{model_name} saved successfully.')
