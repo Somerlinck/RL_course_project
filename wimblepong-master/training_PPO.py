@@ -102,7 +102,7 @@ def test(env_name, episodes, params, render):
             action, _ = agent.get_action(state, evaluation=True)
             observation, reward, done, info = env.step(action.detach().cpu().numpy())
 
-            if render:
+            if False:
                 env.render()
             test_reward += reward
             test_len += 1
