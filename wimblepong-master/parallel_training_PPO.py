@@ -17,7 +17,7 @@ def transform_observations(previous_observations, observations, x_arena_res=200,
 
 
 # Policy training function
-def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=True):
+def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=False):
     # Create a Gym environment
     # This creates 64 parallel envs running in 8 processes (8 envs each)
     env = ParallelEnvs(env_name, processes=8, envs_per_process=8)
@@ -33,11 +33,14 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, u
 
     if load :
         print("Loading model")
-        model = torch.load('Model/modelPG_last.mdl')
-        print(model)
+        checkpoint = torch.load('Model/modelPG_last.mdl')
+        model = checkpoint['model']
+        optimizer = checkpoint['optimizer']
         AC.load_state_dict(model)
-
-    agent = Agent(AC_old, AC)
+        agent = Agent(AC_old, AC)
+        agent.optimizer.load_state_dict(optimizer)
+    else :
+        agent = Agent(AC_old, AC)
 
 
     # Arrays to keep track of rewards
@@ -77,11 +80,15 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, u
             agent.update(0)
             avg_rewards = None
 
-        if timestep % 10000 == 0:
+        if timestep % 50000 == 0:
           model_name = "modelPG_" + str(timestep)
           path = f'Model/{model_name}.mdl'
           print(f'Saving {model_name} model...')
-          torch.save(agent.policy.state_dict(), path)
+          checkpoint = {
+              'model'=agent.policy.state_dict(),
+              'optimizer' = agent.optimizer.state_dict()
+          }
+          torch.save(checkpoint, path)
           print(f'{model_name} saved successfully.')
 
 
