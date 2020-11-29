@@ -17,7 +17,7 @@ def transform_observations(previous_observations, observations, x_arena_res=200,
 
 
 # Policy training function
-def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=False):
+def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=True):
     # Create a Gym environment
     # This creates 64 parallel envs running in 8 processes (8 envs each)
     env = ParallelEnvs(env_name, processes=8, envs_per_process=8)
