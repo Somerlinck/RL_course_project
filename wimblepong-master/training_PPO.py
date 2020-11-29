@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def transform_observation(previous_observation, observation, x_arena_res=200, y_arena_res=200):
-    mat = abs(2*observation.dot([0.07, 0.72, 0.21]) - previous_observation.dot([0.07, 0.72, 0.21])) \
+    mat = 2*observation.dot([0.07, 0.72, 0.21]) - previous_observation.dot([0.07, 0.72, 0.21]) \
         if previous_observation is not None else np.zeros((y_arena_res, x_arena_res))
     return mat.ravel()
 
