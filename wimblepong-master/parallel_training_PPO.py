@@ -34,11 +34,12 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, u
     if load :
         print("Loading model")
         checkpoint = torch.load('Model/modelPG_last.mdl')
-        model = checkpoint['model']
-        optimizer = checkpoint['optimizer']
+        #model = checkpoint['model']
+        model = checkpoint
+        #optimizer = checkpoint['optimizer']
         AC.load_state_dict(model)
         agent = Agent(AC_old, AC)
-        agent.optimizer.load_state_dict(optimizer)
+        #agent.optimizer.load_state_dict(optimizer)
     else :
         agent = Agent(AC_old, AC)
 
