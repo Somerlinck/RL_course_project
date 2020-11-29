@@ -108,7 +108,7 @@ def test(env_name, episodes, params, render):
             # (evaluation=True makes the agent always return what it thinks to be
             # the best action - there is no exploration at this point)
             state = transform_observations(previous_observation, observation)
-            action, _ = agent.get_action(observation, evaluation=True)
+            action, _ = agent.get_action(state, evaluation=True)
             previous_observation = observation
             observation, reward, done, info = env.step(action.detach().cpu().numpy())
             
