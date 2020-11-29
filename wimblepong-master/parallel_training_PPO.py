@@ -101,14 +101,17 @@ def test(env_name, episodes, params, render):
     for ep in range(episodes):
         done = False
         observation = env.reset()
+        previous_observation = None
         while not done:
             # Similar to the training loop above -
             # get the action, act on the environment, save total reward
             # (evaluation=True makes the agent always return what it thinks to be
             # the best action - there is no exploration at this point)
+            state = transform_observations(previous_observation, observation)
             action, _ = agent.get_action(observation, evaluation=True)
+            previous_observation = observation
             observation, reward, done, info = env.step(action.detach().cpu().numpy())
-
+            
             if render:
                 env.render()
             test_reward += reward
