@@ -66,9 +66,9 @@ class Agent(object):
         self.old_policy = AC_old.to(self.train_device)
         self.old_policy.load_state_dict(self.policy.state_dict())
 
-        self.optimizer = torch.optim.Adam(AC.parameters(), lr=5e-3)
+        self.optimizer = torch.optim.Adam(AC.parameters(), lr=3e-4)
         self.gamma = 0.98
-        self.K_epochs = 3
+        self.K_epochs = 4
         self.epsilon_clip = 0.2
 
         self.states = []
@@ -124,7 +124,7 @@ class Agent(object):
             advantages = returns - state_values.detach()
             surrogate1 = ratios * advantages
             surrogate2 = torch.clamp(ratios, min=1-self.epsilon_clip, max=1+self.epsilon_clip) * advantages
-            loss = - torch.min(surrogate1, surrogate2).mean() + F.mse_loss(returns, state_values) - 0.01*dist_entropy.mean()
+            loss = - torch.min(surrogate1, surrogate2).mean() + F.mse_loss(returns, state_values) - 0.001*dist_entropy.mean()
 
             # Update network parameters
             if episode_number % 50 == 0:

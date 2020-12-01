@@ -26,7 +26,7 @@ def state_cnn(observation_1, observation_2, observation_3, x_arena_res=200, y_ar
 
 
 # Policy training function
-def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=False):
+def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=64, load=False):
     # Create a Gym environment
     # This creates 64 parallel envs running in 8 processes (8 envs each)
     env = ParallelEnvs(env_name, processes=8, envs_per_process=8)
