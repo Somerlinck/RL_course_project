@@ -10,7 +10,7 @@ def transform_observations(previous_observations, observations, x_arena_res=200,
     nb_proc = observations.shape[0]
     res = np.zeros((nb_proc, x_arena_res * y_arena_res))
     for i in range(nb_proc):
-        mat = abs(2*observations[i].dot([0.07, 0.72, 0.21]) - previous_observations[i].dot([0.07, 0.72, 0.21])) \
+        mat = 2*observations[i].dot([0.07, 0.72, 0.21]) - previous_observations[i].dot([0.07, 0.72, 0.21]) \
             if previous_observations is not None else np.zeros((y_arena_res, x_arena_res))
         res[i] = mat.ravel()
     return res
