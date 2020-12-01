@@ -7,17 +7,17 @@ from parallel_env import ParallelEnvs
 
 
 def transform_observations(previous_observations, observations, x_arena_res=200, y_arena_res=200):
-    n_proc = observations.shape[0]
-    res = np.zeros((n_proc, x_arena_res * y_arena_res))
-    for i in range(n_proc):
-        mat = abs(2*observations[i].dot([0.07, 0.72, 0.21]) - previous_observations[i].dot([0.07, 0.72, 0.21])) \
+    nb_proc = observations.shape[0]
+    res = np.zeros((nb_proc, x_arena_res * y_arena_res))
+    for i in range(nb_proc):
+        mat = 2*observations[i].dot([0.07, 0.72, 0.21]) - previous_observations[i].dot([0.07, 0.72, 0.21]) \
             if previous_observations is not None else np.zeros((y_arena_res, x_arena_res))
         res[i] = mat.ravel()
     return res
 
 
 # Policy training function
-def train(env_name, print_things=True, train_run_id=0, train_timesteps=200000, update_steps=50):
+def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, update_steps=50, load=True):
     # Create a Gym environment
     # This creates 64 parallel envs running in 8 processes (8 envs each)
     env = ParallelEnvs(env_name, processes=8, envs_per_process=8)
@@ -30,7 +30,18 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=200000, u
     # Instantiate agent and its policy
     AC_old = ActorCritic(observation_space_dim, action_space_dim)
     AC = ActorCritic(observation_space_dim, action_space_dim)
-    agent = Agent(AC_old, AC)
+
+    if load :
+        print("Loading model")
+        checkpoint = torch.load('Model/modelPG_last.mdl')
+        #model = checkpoint['model']
+        model = checkpoint
+        #optimizer = checkpoint['optimizer']
+        AC.load_state_dict(model)
+        agent = Agent(AC_old, AC)
+        #agent.optimizer.load_state_dict(optimizer)
+    else :
+        agent = Agent(AC_old, AC)
 
     # Arrays to keep track of rewards
     reward_history, timestep_history = [], []
@@ -117,6 +128,7 @@ if __name__ == "__main__":
     parser.add_argument("--env", type=str, default="WimblepongVisualSimpleAI-v0", help="Environment to use")
     parser.add_argument("--train_timesteps", type=int, default=1000, help="Number of timesteps to train for")
     parser.add_argument("--render_test", action='store_true', help="Render test")
+    parser.add_argument("--load", action='store_true', help="load a saved model")
     args = parser.parse_args()
 
     # If no model was passed, train a policy from scratch.
