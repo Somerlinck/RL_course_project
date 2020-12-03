@@ -82,7 +82,7 @@ class Agent(object):
         self.state = np.zeros((1, 3, 200, 200))
 
     def load_model(self):
-        checkpoint = torch.load('joe-wilfried-ponga.mdl')
+        checkpoint = torch.load('model.mdl')
         model = checkpoint['model']
         optimizer = checkpoint['optimizer']
         self.policy.load_state_dict(model)
