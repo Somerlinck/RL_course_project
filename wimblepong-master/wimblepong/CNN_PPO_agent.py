@@ -93,10 +93,10 @@ class Agent(object):
         self.state = np.zeros((1, 3, 200, 200))
 
     def get_name(self):
-        return "Joe-Wilfried PONGa"
+        return "Jo Wilfried PONGa"
 
     def get_action(self, frame):
-        self.state = np.insert(self.state, 0, frame, axis=1)[:, :-1, :]
+        self.state = np.insert(self.state, 0, frame.dot([0.07, 0.72, 0.21]), axis=1)[:, :-1, :]
         x = torch.from_numpy(self.state).float().to(self.train_device)
         aprob, _ = self.old_policy.forward(x)
         action = aprob.argmax()

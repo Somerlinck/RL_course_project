@@ -115,6 +115,7 @@ def test(env_name, episodes, params, render):
     AC_old = ActorCritic(observation_space_dim, action_space_dim)
     AC = ActorCritic(observation_space_dim, action_space_dim)
     agent = Agent(AC_old, AC)
+    agent.load_model()
 
     test_len, wins = 0, 0
     for ep in range(episodes):
@@ -125,8 +126,9 @@ def test(env_name, episodes, params, render):
             # get the action, act on the environment, save total reward
             # (evaluation=True makes the agent always return what it thinks to be
             # the best action - there is no exploration at this point)
-            action, _ = agent.get_action(state)
-            observation_1, reward, done, info = env.step(action.detach().cpu().numpy())
+            action = agent.get_action(state)
+            #observation_1, reward, done, info = env.step(action.detach().cpu().numpy())
+            state, reward, done, info = env.step(action)
 
             test_len += 1
             if False:
@@ -155,6 +157,8 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             print("Interrupted!")
     else:
+        # 30k, 38%, 336.67 length
+        # 25k, 41%, 299.78 length
         state_dict = torch.load(args.test)
         print("Testing...")
         test(args.env, 100, state_dict, args.render_test)
