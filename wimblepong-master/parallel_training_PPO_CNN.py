@@ -67,7 +67,7 @@ def train(env_name, print_things=True, train_run_id=0, train_timesteps=500000, u
     for timestep in range(train_timesteps):
         states = next_states
         # Get action from the agent
-        actions, log_probs = agent.get_action(states)
+        actions, log_probs = agent.get_random_action(states)
 
         # Perform the action on the environment, get new state and reward
         observations_3 = observations_2
@@ -116,28 +116,25 @@ def test(env_name, episodes, params, render):
     AC = ActorCritic(observation_space_dim, action_space_dim)
     agent = Agent(AC_old, AC)
 
-    test_reward, test_len = 0, 0
+    test_len, wins = 0, 0
     for ep in range(episodes):
         done = False
-        observation_1 = env.reset()
-        observation_3 = np.zeros((y_arena_res, x_arena_res, 3))
-        observation_2 = np.zeros((y_arena_res, x_arena_res, 3))
+        state = env.reset()
         while not done:
-            state = state_cnn(observation_1, observation_2, observation_3)
             # Similar to the training loop above -
             # get the action, act on the environment, save total reward
             # (evaluation=True makes the agent always return what it thinks to be
             # the best action - there is no exploration at this point)
-            action, _ = agent.get_action(state, evaluation=True)
-            observation_3 = observation_2
-            observation_2 = observation_1
+            action, _ = agent.get_action(state)
             observation_1, reward, done, info = env.step(action.detach().cpu().numpy())
 
+            test_len += 1
             if False:
                 env.render()
-            test_reward += reward
-            test_len += 1
-    print("Average test reward:", test_reward/episodes, "episode length:", test_len/episodes)
+        if reward > 0:
+            wins += 1
+        agent.reset()
+    print("Win ratio (%):", 100*wins/episodes, "episode length:", test_len/episodes)
 
 
 if __name__ == "__main__":

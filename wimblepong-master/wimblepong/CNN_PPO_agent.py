@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.distributions import Categorical
 import torch.nn.functional as F
+import numpy as np
 
 
 def init_layer(m):
@@ -78,16 +79,34 @@ class Agent(object):
         self.actions = []
         self.dones = []
 
-    def get_action(self, observation, evaluation=False):
+        self.state = np.zeros((1, 3, 200, 200))
+
+    def load_model(self):
+        checkpoint = torch.load('joe-wilfried-ponga.mdl')
+        model = checkpoint['model']
+        optimizer = checkpoint['optimizer']
+        self.policy.load_state_dict(model)
+        self.old_policy.load_state_dict(model)
+        self.optimizer.load_state_dict(optimizer)
+
+    def reset(self):
+        self.state = np.zeros((1, 3, 200, 200))
+
+    def get_name(self):
+        return "Joe-Wilfried PONGa"
+
+    def get_action(self, frame):
+        self.state = np.insert(self.state, 0, frame, axis=1)[:, :-1, :]
+        x = torch.from_numpy(self.state).float().to(self.train_device)
+        aprob, _ = self.old_policy.forward(x)
+        action = aprob.argmax()
+        return action.item()
+
+    def get_random_action(self, observation):
         x = torch.from_numpy(observation).float().to(self.train_device)
         aprob, _ = self.old_policy.forward(x)
         distribution = Categorical(aprob)
-
-        if evaluation:
-            action = aprob.argmax()
-        else:
-            action = distribution.sample()
-
+        action = distribution.sample()
         return action, distribution.log_prob(action)
 
     def store_outcome(self, state_array, log_prob, action, reward, next_state_array, done):
