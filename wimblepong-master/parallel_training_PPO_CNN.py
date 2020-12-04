@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 from wimblepong.CNN_PPO_agent import Agent, ActorCritic
 from parallel_env import ParallelEnvs
+import matplotlib.pyplot as plt
 
 
 def states_cnn(observations_1, observations_2, observations_3, x_arena_res=200, y_arena_res=200):
@@ -117,8 +118,9 @@ def test(env_name, episodes, params, render):
     agent = Agent(AC_old, AC)
     agent.load_model()
 
-    test_len, wins = 0, 0
+    lengths, wins = [], 0
     for ep in range(episodes):
+        test_len = 0
         done = False
         state = env.reset()
         while not done:
@@ -133,10 +135,18 @@ def test(env_name, episodes, params, render):
             test_len += 1
             if False:
                 env.render()
+        lengths.append(test_len)
         if reward > 0:
             wins += 1
         agent.reset()
-    print("Win ratio (%):", 100*wins/episodes, "episode length:", test_len/episodes)
+    lengths = np.array(lengths)
+    p = round(wins/episodes, 3)
+    delta = round(1.96 * np.sqrt(p*(1-p)/episodes), 3)
+    percentile = np.percentile(lengths, [2.5, 97.5])
+    _ = plt.hist(lengths, bins='auto')
+    plt.title("Histogram of episode duration")
+    plt.show()
+    print("Win ratio (%):", 100*p, "+/-", 100*delta, ", episode length 95% percentile:", percentile)
 
 
 if __name__ == "__main__":
